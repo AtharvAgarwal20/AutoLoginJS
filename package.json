@@ -1,0 +1,15 @@
+{
+  "name": "autologinjs",
+  "version": "1.0.0",
+  "description": "Autologin script for BITS WiFi",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.41.0"
+  }
+}
