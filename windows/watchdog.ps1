@@ -34,23 +34,42 @@ Write-Log "🔁 Watchdog started (interval: ${CheckInterval}s)"
 $loopCount = 0
 
 while ($true) {
-    try {
-        $response = Invoke-WebRequest -Uri "http://captive.apple.com" -UseBasicParsing -TimeoutSec 5 -MaximumRedirection 5
-        $body = $response.Content
+    # Check if network is available
+    $networkUp = Test-Connection -ComputerName 8.8.8.8 -Count 1 -Quiet -TimeoutSeconds 3 2>$null
+    if (-not $networkUp) {
+        # Also try the captive portal URL in case DNS/ping is blocked but HTTP works
+        try {
+            $null = Invoke-WebRequest -Uri "http://captive.apple.com" -UseBasicParsing -TimeoutSec 3 -MaximumRedirection 0 -ErrorAction Stop
+            $networkUp = $true
+        } catch [System.Net.WebException] {
+            # Got a web response (even a redirect) = network is up
+            if ($_.Exception.Response) { $networkUp = $true }
+        } catch {
+            # No response at all = no network
+        }
+    }
 
-        if ($body -match "Success") {
-            Write-Log "✅ Session active."
-        } else {
+    if (-not $networkUp) {
+        Write-Log "📡 No network connection (Wi-Fi off?). Skipping."
+    } else {
+        try {
+            $response = Invoke-WebRequest -Uri "http://captive.apple.com" -UseBasicParsing -TimeoutSec 5 -MaximumRedirection 5
+            $body = $response.Content
+
+            if ($body -match "Success") {
+                Write-Log "✅ Session active."
+            } else {
+                Write-Log "🔐 Captive portal detected! Re-authenticating..."
+                Set-Location $ProjectDir
+                & node index.js 2>&1 | Out-File -Append -FilePath $LogFile
+                Write-Log "✅ Login script finished."
+            }
+        } catch {
             Write-Log "🔐 Captive portal detected! Re-authenticating..."
             Set-Location $ProjectDir
             & node index.js 2>&1 | Out-File -Append -FilePath $LogFile
             Write-Log "✅ Login script finished."
         }
-    } catch {
-        Write-Log "🔐 Captive portal detected! Re-authenticating..."
-        Set-Location $ProjectDir
-        & node index.js 2>&1 | Out-File -Append -FilePath $LogFile
-        Write-Log "✅ Login script finished."
     }
 
     # Trim log every ~50 checks

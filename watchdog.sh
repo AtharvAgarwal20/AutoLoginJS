@@ -29,8 +29,11 @@ LOOP_COUNT=0
 
 while true; do
 	RESPONSE=$(curl -s -L --max-time 5 http://captive.apple.com 2>/dev/null)
+	CURL_EXIT=$?
 
-	if echo "$RESPONSE" | grep -q "Success"; then
+	if [ "$CURL_EXIT" -ne 0 ]; then
+		log "📡 No network connection (Wi-Fi off?). Skipping."
+	elif echo "$RESPONSE" | grep -q "Success"; then
 		log "✅ Session active."
 	else
 		log "🔐 Captive portal detected! Re-authenticating..."
