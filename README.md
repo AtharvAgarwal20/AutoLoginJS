@@ -37,18 +37,42 @@ PASSWORD="YourPassword123#"
 
 ## Usage
 
+### Manual Run
+
 Connect to the BITS Wi-Fi network, then run:
 
 ```bash
 node index.js
 ```
 
-The script will:
+### Background Watchdog (Recommended)
 
-1. Open Safari and navigate to `http://captive.apple.com`
-2. Wait for the captive portal redirect
-3. Fill in your username and password
-4. Click the **Continue** button to log in
+The watchdog runs silently in the background, checking every **5 minutes** if your Wi-Fi session has expired on **BITS-STAFF** or **BITS-STUDENT** and automatically re-authenticates.
+
+**Start the watchdog:**
+
+```bash
+./start.sh
+```
+
+This installs a macOS LaunchAgent that:
+
+- Starts automatically on boot
+- Runs without a terminal window
+- Restarts itself if it crashes
+- Logs activity to `watchdog.log`
+
+**Stop the watchdog:**
+
+```bash
+./stop.sh
+```
+
+**Check logs:**
+
+```bash
+tail -f watchdog.log
+```
 
 ## Using a Different Browser
 
