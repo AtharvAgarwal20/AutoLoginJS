@@ -19,6 +19,8 @@ fi
 
 log "🔁 Watchdog started (checking every ${CHECK_INTERVAL}s)"
 
+LOOP_COUNT=0
+
 while true; do
 	RESPONSE=$(curl -s -L --max-time 5 http://captive.apple.com 2>/dev/null)
 
@@ -28,6 +30,13 @@ while true; do
 		log "🔐 Captive portal detected! Re-authenticating..."
 		cd "$SCRIPT_DIR" && node index.js >>"$LOG_FILE" 2>&1
 		log "✅ Login script finished."
+	fi
+
+	# Trim log every ~50 checks to prevent bloat
+	LOOP_COUNT=$((LOOP_COUNT + 1))
+	if [ "$LOOP_COUNT" -ge 50 ]; then
+		tail -200 "$LOG_FILE" >"$LOG_FILE.tmp" && mv "$LOG_FILE.tmp" "$LOG_FILE"
+		LOOP_COUNT=0
 	fi
 
 	sleep "$CHECK_INTERVAL"

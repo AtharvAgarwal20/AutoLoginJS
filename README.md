@@ -8,6 +8,10 @@ Automatically log in to the BITS Pilani campus Wi-Fi captive portal using Seleni
 - Safari browser with WebDriver enabled
   - Open Safari → **Develop** menu → enable **Allow Remote Automation**
   - If you don't see the Develop menu: Safari → **Settings** → **Advanced** → check **Show features for web developers**
+  - Enable SafariDriver in terminal:
+    ```bash
+    safaridriver --enable
+    ```
 
 ## Setup
 
