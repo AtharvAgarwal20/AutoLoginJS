@@ -3,14 +3,20 @@ const { Builder, Browser, By, Key, until } = require("selenium-webdriver");
 const os = require("os");
 
 function getBrowser() {
-  const platform = os.platform();
-  if (platform === "darwin") return Browser.SAFARI;
-  return Browser.CHROME; // Chrome works on Linux & Windows
+  const envBrowser = (process.env.BROWSER || "").toLowerCase();
+
+  if (envBrowser === "chrome") return Browser.CHROME;
+  if (envBrowser === "firefox") return Browser.FIREFOX;
+  if (envBrowser === "safari") return Browser.SAFARI;
+
+  // Auto-detect: Safari on macOS, Chrome everywhere else
+  if (os.platform() === "darwin") return Browser.SAFARI;
+  return Browser.CHROME;
 }
 
 async function AutoLoginHandler() {
   const browser = getBrowser();
-  console.log(`Using browser: ${browser} (${os.platform()})`);
+  console.log(`[AutoLoginJS] Browser: ${browser} | OS: ${os.platform()}`);
   let driver = await new Builder().forBrowser(browser).build();
 
   try {

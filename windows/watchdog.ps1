@@ -1,10 +1,22 @@
 # AutoLogin Watchdog for BITS Wi-Fi (Windows)
 # Continuously monitors the captive portal session and re-authenticates when needed.
+# Configuration is read from the .env file.
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectDir = Split-Path -Parent $ScriptDir
 $LogFile = Join-Path $ProjectDir "watchdog.log"
-$CheckInterval = 300 # 5 minutes
+$EnvFile = Join-Path $ProjectDir ".env"
+
+# Load CHECK_INTERVAL from .env (default: 300 seconds)
+$CheckInterval = 300
+if (Test-Path $EnvFile) {
+    $envContent = Get-Content $EnvFile
+    foreach ($line in $envContent) {
+        if ($line -match '^CHECK_INTERVAL=["'']?(\d+)["'']?') {
+            $CheckInterval = [int]$Matches[1]
+        }
+    }
+}
 
 function Write-Log($Message) {
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -17,7 +29,7 @@ if (Test-Path $LogFile) {
     $lines | Set-Content $LogFile
 }
 
-Write-Log "🔁 Watchdog started (checking every $($CheckInterval / 60)m)"
+Write-Log "🔁 Watchdog started (interval: ${CheckInterval}s)"
 
 $loopCount = 0
 

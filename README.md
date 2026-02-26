@@ -38,19 +38,26 @@ npm install
 
 ### 2. Create Your `.env` File
 
-Create a file named `.env` in the project root with your BITS credentials:
+Create a file named `.env` in the project root:
 
 ```env
+# Credentials
 USERNAME="your_bits_id"
 PASSWORD="your_password"
+
+# Browser: "safari", "chrome", or "firefox" (leave empty for auto-detect)
+BROWSER=""
+
+# Watchdog check interval in seconds (default: 300 = 5 minutes)
+CHECK_INTERVAL=300
 ```
 
-**Example:**
-
-```env
-USERNAME="F20XXXXXX"
-PASSWORD="YourPassword123#"
-```
+| Variable         | Description                     | Default                                  |
+| ---------------- | ------------------------------- | ---------------------------------------- |
+| `USERNAME`       | Your BITS login ID              | _required_                               |
+| `PASSWORD`       | Your BITS password              | _required_                               |
+| `BROWSER`        | Force a specific browser        | Auto (Safari on macOS, Chrome elsewhere) |
+| `CHECK_INTERVAL` | Seconds between watchdog checks | `300` (5 min)                            |
 
 > ⚠️ **Do not share or commit this file.** It is already listed in `.gitignore`.
 
