@@ -1,9 +1,17 @@
 require("dotenv").config();
 const { Builder, Browser, By, Key, until } = require("selenium-webdriver");
+const os = require("os");
+
+function getBrowser() {
+  const platform = os.platform();
+  if (platform === "darwin") return Browser.SAFARI;
+  return Browser.CHROME; // Chrome works on Linux & Windows
+}
 
 async function AutoLoginHandler() {
-  //   let driver = await new Builder().forBrowser(Browser.CHROME).build();
-  let driver = await new Builder().forBrowser(Browser.SAFARI).build();
+  const browser = getBrowser();
+  console.log(`Using browser: ${browser} (${os.platform()})`);
+  let driver = await new Builder().forBrowser(browser).build();
 
   try {
     await driver.get("http://captive.apple.com");

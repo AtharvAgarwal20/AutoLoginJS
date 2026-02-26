@@ -2,16 +2,31 @@
 
 Automatically log in to the BITS Pilani campus Wi-Fi captive portal using Selenium WebDriver.
 
+Works on **macOS**, **Linux**, and **Windows**.
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) (v18+)
-- Safari browser with WebDriver enabled
-  - Open Safari → **Develop** menu → enable **Allow Remote Automation**
-  - If you don't see the Develop menu: Safari → **Settings** → **Advanced** → check **Show features for web developers**
-  - Enable SafariDriver in terminal:
-    ```bash
-    safaridriver --enable
-    ```
+- A supported browser:
+
+| OS      | Default Browser | Driver Required                                                |
+| ------- | --------------- | -------------------------------------------------------------- |
+| macOS   | Safari          | Built-in (just enable it)                                      |
+| Linux   | Chrome          | [ChromeDriver](https://developer.chrome.com/docs/chromedriver) |
+| Windows | Chrome          | [ChromeDriver](https://developer.chrome.com/docs/chromedriver) |
+
+### macOS — Enable SafariDriver
+
+```bash
+safaridriver --enable
+```
+
+Also enable: Safari → **Develop** → **Allow Remote Automation**
+(If no Develop menu: Safari → **Settings** → **Advanced** → **Show features for web developers**)
+
+### Linux / Windows — Install ChromeDriver
+
+Install [Google Chrome](https://www.google.com/chrome/) and [ChromeDriver](https://developer.chrome.com/docs/chromedriver) matching your Chrome version.
 
 ## Setup
 
@@ -43,48 +58,84 @@ PASSWORD="YourPassword123#"
 
 ### Manual Run
 
-Connect to the BITS Wi-Fi network, then run:
-
 ```bash
 node index.js
 ```
 
+The script auto-detects your OS and picks the right browser.
+
+---
+
 ### Background Watchdog (Recommended)
 
-The watchdog runs silently in the background, checking every **5 minutes** if your Wi-Fi session has expired on **BITS-STAFF** or **BITS-STUDENT** and automatically re-authenticates.
+The watchdog runs silently in the background, checking every **5 minutes** if your session has expired and automatically re-authenticates.
 
-**Start the watchdog:**
+<details>
+<summary><strong>🍎 macOS</strong></summary>
+
+**Start:**
 
 ```bash
 ./start.sh
 ```
 
-This installs a macOS LaunchAgent that:
-
-- Starts automatically on boot
-- Runs without a terminal window
-- Restarts itself if it crashes
-- Logs activity to `watchdog.log`
-
-**Stop the watchdog:**
+**Stop:**
 
 ```bash
 ./stop.sh
 ```
 
-**Check logs:**
+Uses macOS **LaunchAgent** — runs at login, no terminal window needed.
+
+</details>
+
+<details>
+<summary><strong>🐧 Linux</strong></summary>
+
+**Start:**
 
 ```bash
-tail -f watchdog.log
+./linux/start.sh
 ```
 
-## Using a Different Browser
+**Stop:**
 
-By default the script uses Safari. To use Chrome instead, edit `index.js`:
-
-```diff
-- let driver = await new Builder().forBrowser(Browser.SAFARI).build();
-+ let driver = await new Builder().forBrowser(Browser.CHROME).build();
+```bash
+./linux/stop.sh
 ```
 
-You will also need to install [ChromeDriver](https://developer.chrome.com/docs/chromedriver) for this to work.
+**Status:**
+
+```bash
+sudo systemctl status autologin-watchdog
+```
+
+Uses **systemd** — runs as a system service, persists across reboots.
+
+</details>
+
+<details>
+<summary><strong>🪟 Windows</strong></summary>
+
+**Start** (run as Administrator):
+
+```bat
+windows\start.bat
+```
+
+**Stop:**
+
+```bat
+windows\stop.bat
+```
+
+Uses **Task Scheduler** — runs at logon, hidden in background.
+
+</details>
+
+### Check Logs (all platforms)
+
+```bash
+tail -f watchdog.log          # macOS / Linux
+Get-Content watchdog.log -Wait # Windows PowerShell
+```

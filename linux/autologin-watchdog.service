@@ -1,0 +1,14 @@
+[Unit]
+Description=AutoLoginJS Watchdog - BITS Wi-Fi auto-login
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /opt/autologinjs/watchdog.sh
+Restart=always
+RestartSec=10
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=multi-user.target
