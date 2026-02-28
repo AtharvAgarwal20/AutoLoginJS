@@ -37,8 +37,25 @@ while true; do
 		log "✅ Session active."
 	else
 		log "🔐 Captive portal detected! Re-authenticating..."
+
+		# Disconnect Cloudflare WARP if it's running (it blocks captive portal)
+		if command -v warp-cli &>/dev/null; then
+			WARP_STATUS=$(warp-cli status 2>/dev/null | grep -i "connected" || true)
+			if [ -n "$WARP_STATUS" ]; then
+				log "🛑 Disconnecting Cloudflare WARP..."
+				warp-cli disconnect >>"$LOG_FILE" 2>&1
+				sleep 2
+			fi
+		fi
+
 		cd "$SCRIPT_DIR" && node index.js >>"$LOG_FILE" 2>&1
 		log "✅ Login script finished."
+
+		# Reconnect WARP after successful login
+		if command -v warp-cli &>/dev/null; then
+			log "🔄 Reconnecting Cloudflare WARP..."
+			warp-cli connect >>"$LOG_FILE" 2>&1
+		fi
 	fi
 
 	# Trim log every ~50 checks to prevent bloat
