@@ -28,13 +28,16 @@ async function AutoLoginHandler() {
     );
     await usernameField.sendKeys(process.env.USERNAME);
 
+    await driver.sleep(500);
+
     let passwordField = await driver.wait(
       until.elementLocated(By.name("password")),
       10000,
     );
+    await passwordField.click();
     await passwordField.sendKeys(process.env.PASSWORD);
 
-    await driver.sleep(500);
+    await driver.sleep(1000);
     let continueBtn = await driver.wait(
       until.elementLocated(By.xpath("//button[@type='submit']")),
       10000,
@@ -43,7 +46,7 @@ async function AutoLoginHandler() {
   } catch (err) {
     console.log(err);
   } finally {
-    await driver.sleep(500);
+    await driver.sleep(1000);
     await driver.quit();
   }
 }
